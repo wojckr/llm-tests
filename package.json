@@ -1,0 +1,20 @@
+{
+  "name": "llm-anchoring-experiment",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Does an example value placed in a prompt move the numeric answers of free large language models towards it?",
+  "scripts": {
+    "collect": "node src/runAnchoringExperiment.js",
+    "stats": "node src/showStats.js",
+    "readme": "node src/buildReadme.js",
+    "readme:final": "node src/buildReadme.js --final"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "marked": "^18.0.12"
+  }
+}

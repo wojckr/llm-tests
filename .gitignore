@@ -1,0 +1,13 @@
+.env
+openrouter_key.txt
+CLAUDE.md
+temp/
+node_modules/
+
+# The hand-written sections the document is built from. They stay outside version control while the
+# text is still being worked on; what is finished reaches the published README.md and docs/index.html.
+content/
+
+# Timestamped dumps of successive runs of the terminal instrument. They are working material: every
+# one of them is reproducible from the answers in data/ by running the scripts again.
+output/
