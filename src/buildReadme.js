@@ -22,6 +22,9 @@ const SUBTITLE = 'Measuring Anchoring in Free Language Models';
 // Where an article published elsewhere sends the reader for the prompts, the answers and the code.
 const REPOSITORY_URL = 'https://github.com/wojckr/llm-tests';
 
+// The page served from DOCS_DIR, where the whole report is read.
+const PAGES_URL = 'https://wojckr.github.io/llm-tests';
+
 // The published cemetery registry entry the reference year is read from.
 const GRAVE_RECORD_URL = 'https://www.parafiaszewna.pl/cmentarz/szewna/grave/detail/1929482';
 
@@ -37,7 +40,7 @@ const LATEST_ONLY_SWITCH = '--latest-only';
 // An article reaches the published document whole only when its identifier stands here. Every other
 // article keeps its title and loses its text, so the page can name what is coming without showing a
 // text still being written.
-const PUBLISHED_ARTICLE_IDS = ['variants'];
+const PUBLISHED_ARTICLE_IDS = ['anchoring-effect'];
 
 // What stands under the title of an article that is not published yet: a quiet line for the reader of
 // the published page, and a loud one for the author reading the copy under temp/, where the text of
@@ -325,21 +328,59 @@ const withUnpublishedArticlesMarked = (document, note, dropText) => {
 };
 
 /**
- * Puts the parts of the document together: the title, the lead that opens it, the table of contents
+ * Separates the text that opens the report from the sections that follow it.
+ * @author Wojciech Krajewski; Claude Opus 5.
+ * @date 2026-09-25.
+ * @param {string} body The assembled and numbered sections.
+ * @return {{lead: string, sections: string}} The opening text and everything after it.
+ * @throws {Error} When the body does not open with a lead followed by a section.
+ */
+const splitLead = (body) => {
+  const firstSection = body.indexOf('\n## ');
+  if (firstSection <= 0) throw new Error('The document has to open with a lead, followed by its first section.');
+
+  return { lead: body.slice(0, firstSection).trim(), sections: body.slice(firstSection + 1) };
+};
+
+/**
+ * Builds the front page of the repository: the title, the text that opens the report and the address
+ * the report is read at. The report itself is a page rather than a Markdown file, because a chart
+ * drawn as an SVG element survives in a browser and does not survive the Markdown of a repository.
+ * @author Wojciech Krajewski; Claude Opus 5.
+ * @date 2026-09-25.
+ * @param {string} lead The text that opens the report.
+ * @return {string} The front page as Markdown.
+ * @throws {never} Throws nothing.
+ */
+const frontPage = (lead) => [
+  `# ${TITLE}`,
+  '',
+  SUBTITLE,
+  '',
+  lead,
+  '',
+  `## [Read the report](${PAGES_URL})`,
+  '',
+  'The charts are drawn as SVG elements, which a browser shows and a Markdown file of a repository does not,',
+  'so the report is published as a page rather than as this file.',
+  '',
+  '`data/` holds every answer collected, `src/` the scripts that collected and read them, and `docs/` the published page.',
+  ''
+].join('\n');
+
+/**
+ * Puts the parts of the report together: the title, the lead that opens it, the table of contents
  * built from the headings, and the sections themselves.
  * @author Wojciech Krajewski; Claude Opus 5.
  * @date 2026-09-25.
  * @param {string} body The assembled and numbered sections.
- * @return {string} The whole document as Markdown.
+ * @return {string} The whole report as Markdown.
  * @throws {Error} When the body does not open with a lead followed by a section.
  */
 const assembleDocument = (body) => {
-  // The text before the first section opens the document, above the table of contents; the sections
+  // The text before the first section opens the report, above the table of contents; the sections
   // themselves follow it.
-  const firstSection = body.indexOf('\n## ');
-  if (firstSection <= 0) throw new Error('The document has to open with a lead, followed by its first section.');
-  const lead = body.slice(0, firstSection).trim();
-  const sections = body.slice(firstSection + 1);
+  const { lead, sections } = splitLead(body);
 
   return [
     `# ${TITLE}`,
@@ -401,14 +442,15 @@ const buildReadme = () => {
   }
 
   if (final) {
-    const publishedDocument = assembleDocument(withoutStatusMarkers(withUnpublishedArticlesMarked(body, IN_PREPARATION_NOTE, true)));
+    const publishedBody = withoutStatusMarkers(withUnpublishedArticlesMarked(body, IN_PREPARATION_NOTE, true));
+    const publishedDocument = assembleDocument(publishedBody);
 
     mkdirSync(DOCS_DIR, { recursive: true });
-    writeFileSync(README_PATH, publishedDocument);
+    writeFileSync(README_PATH, frontPage(splitLead(publishedBody).lead));
     writeFileSync(REPORT_PATH, renderHtml(publishedDocument, TITLE));
     console.log(`published articles: ${PUBLISHED_ARTICLE_IDS.join(', ')}`);
-    console.log(`published document overwritten: ${README_PATH}`);
-    console.log(`published page overwritten:     ${REPORT_PATH}`);
+    console.log(`front page overwritten:     ${README_PATH}`);
+    console.log(`published page overwritten: ${REPORT_PATH}`);
     return;
   }
   console.log('Published files left untouched. Run "npm run readme:final" to overwrite them.');

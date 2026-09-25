@@ -263,7 +263,7 @@ They also show how the models themselves behave, and that part is no less intere
 <li><a href="#limitations-of-the-design">Limitations of the design</a></li>
 <li><a href="#what-emerged-along-the-way">What emerged along the way</a></li>
 <li><a href="#articles">Articles</a><ul>
-<li><a href="#variants">1. Variants: two prompts, one example apart</a></li>
+<li><a href="#anchoring-effect">1. LLMs are not free of the anchoring effect: a prompt with an accidental suggestion</a></li>
 <li><a href="#model-shift">2. Model shift: asking each model to disagree with itself</a></li>
 <li><a href="#last-digit">3. A rounded 1800 example in the prompt shifted the last digit in the answer towards zero</a></li>
 <li><a href="#accuracy">4. Accuracy: which models land near the documented year, and which merely look like it</a></li>
@@ -335,8 +335,8 @@ the articles below.</p>
 <h2 id="articles">Articles</h2>
 <p>Each article below stands on its own and carries an identifier. The same identifier prints the
 statistics behind that article in the terminal, with <code>npm run stats --id=&lt;identifier&gt;</code>.</p>
-<h3 id="variants"><span class="ordinal">1.</span> Variants: two prompts, one example apart</h3>
-<p class="article-id">article id: variants</p><p>In 1974 <a href="https://en.wikipedia.org/wiki/Amos_Tversky">Amos Tversky</a> and
+<h3 id="anchoring-effect"><span class="ordinal">1.</span> LLMs are not free of the anchoring effect: a prompt with an accidental suggestion</h3>
+<p class="article-id">article id: anchoring-effect</p><p>In 1974 <a href="https://en.wikipedia.org/wiki/Amos_Tversky">Amos Tversky</a> and
 <a href="https://en.wikipedia.org/wiki/Daniel_Kahneman">Daniel Kahneman</a> described what happens when a person is shown a number before estimating an unrelated quantity: the estimate drifts towards it, an effect they called <a href="https://en.wikipedia.org/wiki/Anchoring_effect">anchoring</a>. The number carries no information, the people are told so, and the estimate drifts anyway.</p>
 <p>A <a href="https://developers.google.com/machine-learning/glossary?hl=en#language-model">language model</a> can be shown a number in the same accidental way. A <a href="https://developers.google.com/machine-learning/glossary?hl=en#prompt">prompt</a> that asks for a year and ends with an example of the expected form — <code>(np. 1800)</code>, Polish for &quot;e.g. 1800&quot; — has supplied a number nobody meant as a hint. It is there to show the form the answer should take, not the value it should have, and the person writing the prompt chose it without a thought — which is precisely what makes it worth testing.</p>
 <p>The prompt used here asks, in Polish, for an estimate of the birth year of the author&#39;s great-grandfather, who died in 1936, and for the year alone in return. It went to the <a href="https://openrouter.ai/openrouter/free">free models of the OpenRouter service</a> in two versions differing by that one parenthesis and nothing else, sent alternately. Answers that were not exactly four digits were rejected; 2000 answers remained.</p>
